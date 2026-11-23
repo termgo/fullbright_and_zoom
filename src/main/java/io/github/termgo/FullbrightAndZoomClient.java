@@ -7,7 +7,6 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
@@ -29,13 +28,11 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
 	public static KeyBinding FULLBRIGHT_KEY;
 	public static KeyBinding ZOOM_KEY;
 
-	private boolean fullbrightEnabled;
-	private double originalGamma = 1.0;
+	private static boolean fullbrightEnabled;
 
 	@Override
 	public void onInitializeClient() {
-		Config config = loadConfig();
-		fullbrightEnabled = config.fullbrightEnabled;
+		fullbrightEnabled = loadConfig().fullbrightEnabled;
 
 		FULLBRIGHT_KEY = KeyBindingHelper.registerKeyBinding(new KeyBinding(
 				"key.fullbright_and_zoom.fullbright",
@@ -53,41 +50,21 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			while (FULLBRIGHT_KEY.wasPressed()) {
-				toggleFullbright(client);
+				toggleFullbright();
 			}
 		});
-
-		applyFullbrightWhenReady();
 	}
 
-	private void applyFullbrightWhenReady() {
-		if (fullbrightEnabled) {
-			MinecraftClient client = MinecraftClient.getInstance();
-			if (client.options != null) {
-				originalGamma = client.options.getGamma().getValue();
-				client.options.getGamma().setValue(FULLBRIGHT_GAMMA);
-			}
-		}
+	public static boolean isFullbrightEnabled() {
+		return fullbrightEnabled;
 	}
 
-	private void toggleFullbright(MinecraftClient client) {
-		if (client.options == null) {
-			return;
-		}
-
-		if (fullbrightEnabled) {
-			fullbrightEnabled = false;
-			client.options.getGamma().setValue(originalGamma);
-		} else {
-			fullbrightEnabled = true;
-			originalGamma = client.options.getGamma().getValue();
-			client.options.getGamma().setValue(FULLBRIGHT_GAMMA);
-		}
-
+	private static void toggleFullbright() {
+		fullbrightEnabled = !fullbrightEnabled;
 		saveConfig();
 	}
 
-	private Config loadConfig() {
+	private static Config loadConfig() {
 		if (Files.isRegularFile(CONFIG_PATH)) {
 			try (Reader reader = Files.newBufferedReader(CONFIG_PATH, StandardCharsets.UTF_8)) {
 				Config config = GSON.fromJson(reader, Config.class);
@@ -101,7 +78,7 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
 		return new Config();
 	}
 
-	private void saveConfig() {
+	private static void saveConfig() {
 		try {
 			Files.createDirectories(CONFIG_PATH.getParent());
 			try (Writer writer = Files.newBufferedWriter(CONFIG_PATH, StandardCharsets.UTF_8)) {
