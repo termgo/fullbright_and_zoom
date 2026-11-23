@@ -17,6 +17,9 @@
 	"entrypoints": {
 		"main": [
 			"io.github.termgo.Fullbright_and_zoom"
+		],
+		"client": [
+			"io.github.termgo.FullbrightAndZoomClient"
 		]
 	},
 	"mixins": [
