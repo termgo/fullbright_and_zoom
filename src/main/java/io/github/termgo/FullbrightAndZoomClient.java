@@ -9,6 +9,8 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
@@ -50,7 +52,7 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			while (FULLBRIGHT_KEY.wasPressed()) {
-				toggleFullbright();
+				toggleFullbright(client);
 			}
 		});
 	}
@@ -59,9 +61,18 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
 		return fullbrightEnabled;
 	}
 
-	private static void toggleFullbright() {
+	private static void toggleFullbright(MinecraftClient client) {
 		fullbrightEnabled = !fullbrightEnabled;
 		saveConfig();
+
+		if (client.player != null) {
+			Text status = Text.literal(fullbrightEnabled ? "Enabled" : "Disabled")
+					.formatted(fullbrightEnabled ? Formatting.GREEN : Formatting.RED);
+			Text message = Text.literal("[" + Fullbright_and_zoom.MOD_ID + "] ")
+					.append(Text.literal("Fullbright "))
+					.append(status);
+			client.player.sendMessage(message, false);
+		}
 	}
 
 	private static Config loadConfig() {
