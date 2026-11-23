@@ -66,7 +66,7 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
 		saveConfig();
 
 		if (client.player != null) {
-			Text status = Text.literal(fullbrightEnabled ? "Enabled" : "Disabled")
+			Text status = Text.literal(fullbrightEnabled ? "Enabled(1000%)" : "Disabled")
 					.formatted(fullbrightEnabled ? Formatting.GREEN : Formatting.RED);
 			Text message = Text.literal("[" + Fullbright_and_zoom.MOD_ID + "] ")
 					.append(Text.literal("Fullbright "))
