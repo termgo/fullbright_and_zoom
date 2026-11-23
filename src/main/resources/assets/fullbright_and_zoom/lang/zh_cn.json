@@ -1,5 +1,7 @@
 {
   "key.categories.fullbright_and_zoom": "Fullbright 与 Zoom",
   "key.fullbright_and_zoom.fullbright": "切换全亮",
-  "key.fullbright_and_zoom.zoom": "望远镜缩放"
+  "key.fullbright_and_zoom.zoom": "望远镜缩放",
+  "message.fullbright_and_zoom.fullbright_on": "Fullbright enabled",
+  "message.fullbright_and_zoom.fullbright_off": "Fullbright disabled"
 }
