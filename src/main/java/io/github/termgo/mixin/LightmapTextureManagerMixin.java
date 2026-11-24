@@ -10,21 +10,21 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(LightmapTextureManager.class)
 public class LightmapTextureManagerMixin {
-	@Redirect(
-			method = "update",
-			at = @At(
-					value = "INVOKE",
-					target = "Lnet/minecraft/client/option/SimpleOption;getValue()Ljava/lang/Object;"
-			)
-	)
-	private Object fullbright_and_zoom$overrideGamma(SimpleOption<?> option) {
-		MinecraftClient client = MinecraftClient.getInstance();
-		if (FullbrightAndZoomClient.isFullbrightEnabled()
-				&& client.options != null
-				&& option == client.options.getGamma()) {
-			return FullbrightAndZoomClient.FULLBRIGHT_GAMMA;
-		}
+    @Redirect(
+            method = "update",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/option/SimpleOption;getValue()Ljava/lang/Object;"
+            )
+    )
+    private Object fullbright_and_zoom$overrideGamma(SimpleOption<?> option) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (FullbrightAndZoomClient.isFullbrightEnabled()
+                && client.options != null
+                && option == client.options.getGamma()) {
+            return FullbrightAndZoomClient.FULLBRIGHT_GAMMA;
+        }
 
-		return option.getValue();
-	}
+        return option.getValue();
+    }
 }

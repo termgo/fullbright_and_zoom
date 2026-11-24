@@ -8,6 +8,7 @@ For setup instructions, please see the [Fabric Documentation page](https://docs.
 
 - termgo — project author
 - GitHub Copilot — core code and implementation assistance
+- DeepSeek — development assistance (merge conflict resolution, code review, documentation) / 开发协助（冲突解决、代码审查、文档）
 
 ## License
 
