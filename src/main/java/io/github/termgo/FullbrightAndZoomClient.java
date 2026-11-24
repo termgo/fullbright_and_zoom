@@ -37,6 +37,9 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
     private static boolean fullbrightEnabled;
     private static boolean zooming;
     private static boolean zoomTarget;
+    private static boolean zoomCameraOptionsOverridden;
+    private static boolean previousSmoothCameraEnabled;
+    private static double previousMouseSensitivity;
     private static double zoomFactor = DEFAULT_ZOOM_FACTOR;
     private static double zoomTransitionStartProgress;
     private static long zoomTransitionStartNanos = System.nanoTime();
@@ -70,6 +73,7 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
                     && client.currentScreen == null
                     && ZOOM_KEY.isPressed();
             setZooming(shouldZoom);
+            updateZoomCameraOptions(client);
         });
     }
 
@@ -118,6 +122,33 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
         zoomTransitionStartNanos = System.nanoTime();
         zoomTarget = shouldZoom;
         zooming = shouldZoom;
+    }
+
+    private static void updateZoomCameraOptions(MinecraftClient client) {
+        if (client.options == null) {
+            return;
+        }
+
+        double progress = getZoomProgress();
+        if (zooming && !zoomCameraOptionsOverridden) {
+            previousSmoothCameraEnabled = client.options.smoothCameraEnabled;
+            previousMouseSensitivity = client.options.getMouseSensitivity().getValue();
+            zoomCameraOptionsOverridden = true;
+        }
+
+        if (!zoomCameraOptionsOverridden) {
+            return;
+        }
+
+        if (zoomTarget || progress > 0.0) {
+            client.options.smoothCameraEnabled = true;
+            double effectiveZoomFactor = 1.0 + (zoomFactor - 1.0) * progress;
+            client.options.getMouseSensitivity().setValue(previousMouseSensitivity / effectiveZoomFactor);
+        } else {
+            client.options.smoothCameraEnabled = previousSmoothCameraEnabled;
+            client.options.getMouseSensitivity().setValue(previousMouseSensitivity);
+            zoomCameraOptionsOverridden = false;
+        }
     }
 
     private static void toggleFullbright(MinecraftClient client) {
