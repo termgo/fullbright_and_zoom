@@ -10,11 +10,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
-    @Inject(method = "getFov", at = @At("RETURN"), cancellable = true)
-    private void fullbright_and_zoom$applyZoom(Camera camera, float tickDelta, boolean changingFov,
-                                                CallbackInfoReturnable<Double> cir) {
-        if (FullbrightAndZoomClient.isZooming()) {
-            cir.setReturnValue(cir.getReturnValue() / FullbrightAndZoomClient.ZOOM_FACTOR);
-        }
-    }
+	@Inject(method = "getFov", at = @At("RETURN"), cancellable = true)
+	private void fullbright_and_zoom$applyZoom(Camera camera, float tickDelta, boolean changingFov,
+													  CallbackInfoReturnable<Double> cir) {
+		double progress = FullbrightAndZoomClient.getZoomProgress();
+		if (progress > 0.0) {
+			double zoomFactor = 1.0 + (FullbrightAndZoomClient.ZOOM_FACTOR - 1.0) * progress;
+			cir.setReturnValue(cir.getReturnValue() / zoomFactor);
+		}
+	}
 }
