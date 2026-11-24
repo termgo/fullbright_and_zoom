@@ -22,10 +22,10 @@ import java.nio.file.Path;
 
 public class FullbrightAndZoomClient implements ClientModInitializer {
     public static final double FULLBRIGHT_GAMMA = 10.0;
-    public static final double DEFAULT_ZOOM_FACTOR = 4.0;
+    public static final double DEFAULT_ZOOM_FACTOR = 6.0;
     public static final double MIN_ZOOM_FACTOR = 1.0;
     public static final double MAX_ZOOM_FACTOR = 16.0;
-    private static final long ZOOM_TRANSITION_NANOS = 220_000_000L;
+    private static final long ZOOM_TRANSITION_NANOS = 200_000_000L;
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path CONFIG_PATH = FabricLoader.getInstance()
@@ -68,12 +68,7 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
             while (FULLBRIGHT_KEY.wasPressed()) {
                 toggleFullbright(client);
             }
-
-            boolean shouldZoom = client.player != null
-                    && client.currentScreen == null
-                    && ZOOM_KEY.isPressed();
-            setZooming(shouldZoom);
-            updateZoomCameraOptions(client);
+            updateZoomState(client);
         });
     }
 
@@ -101,9 +96,22 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
     public static double getZoomProgress() {
         long elapsed = Math.max(0L, System.nanoTime() - zoomTransitionStartNanos);
         double amount = Math.min(1.0, (double) elapsed / ZOOM_TRANSITION_NANOS);
-        double eased = amount * amount * (3.0 - 2.0 * amount);
+        double eased = amount < 0.5
+                ? 4.0 * amount * amount * amount
+                : 1.0 - Math.pow(-2.0 * amount + 2.0, 3.0) / 2.0;
         return zoomTransitionStartProgress
                 + ((zoomTarget ? 1.0 : 0.0) - zoomTransitionStartProgress) * eased;
+    }
+
+    public static void updateZoomState(MinecraftClient client) {
+        boolean shouldZoom = client != null
+                && client.player != null
+                && client.currentScreen == null
+                && ZOOM_KEY != null
+                && ZOOM_KEY.isPressed();
+
+        setZooming(shouldZoom);
+        updateZoomCameraOptions(client);
     }
 
     private static double sanitizeZoomFactor(double factor) {
@@ -125,7 +133,7 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
     }
 
     private static void updateZoomCameraOptions(MinecraftClient client) {
-        if (client.options == null) {
+        if (client == null || client.options == null) {
             return;
         }
 
