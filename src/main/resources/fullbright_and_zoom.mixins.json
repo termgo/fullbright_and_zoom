@@ -5,10 +5,20 @@
 	"mixins": [
 		"ExampleMixin"
 	],
+<<<<<<< HEAD
+=======
+	"client": [
+		"LightmapTextureManagerMixin"
+	],
+>>>>>>> c480b1419a2baea1dc386d4a32989a57f529156e
 	"injectors": {
 		"defaultRequire": 1
 	},
 	"overwrites": {
 		"requireAnnotations": true
 	}
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> c480b1419a2baea1dc386d4a32989a57f529156e

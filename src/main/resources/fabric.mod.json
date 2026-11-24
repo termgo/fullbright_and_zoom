@@ -17,6 +17,12 @@
 	"entrypoints": {
 		"main": [
 			"io.github.termgo.Fullbright_and_zoom"
+<<<<<<< HEAD
+=======
+		],
+		"client": [
+			"io.github.termgo.FullbrightAndZoomClient"
+>>>>>>> c480b1419a2baea1dc386d4a32989a57f529156e
 		]
 	},
 	"mixins": [
@@ -28,4 +34,8 @@
 		"java": ">=21",
 		"fabric-api": "*"
 	}
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> c480b1419a2baea1dc386d4a32989a57f529156e
