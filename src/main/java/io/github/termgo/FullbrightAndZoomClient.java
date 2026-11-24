@@ -55,14 +55,14 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_G,
                 "key.categories.fullbright_and_zoom"
-        ));
+        )));
 
         ZOOM_KEY = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.fullbright_and_zoom.zoom",
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_C,
                 "key.categories.fullbright_and_zoom"
-        ));
+        )));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (FULLBRIGHT_KEY.wasPressed()) {
@@ -130,7 +130,9 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
         zoomTarget = shouldZoom;
         zooming = shouldZoom;
 
-        if (!shouldZoom) {
+        if (shouldZoom) {
+            zoomFactor = DEFAULT_ZOOM_FACTOR;
+        } else {
             zoomFactor = DEFAULT_ZOOM_FACTOR;
         }
     }
@@ -152,9 +154,11 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
         }
 
         if (zoomTarget || progress > 0.0) {
-            client.options.smoothCameraEnabled = true;
             double effectiveZoomFactor = 1.0 + (zoomFactor - 1.0) * progress;
-            client.options.getMouseSensitivity().setValue(previousMouseSensitivity / effectiveZoomFactor);
+            client.options.smoothCameraEnabled = false;
+            client.options.getMouseSensitivity().setValue(
+                    previousMouseSensitivity / Math.max(effectiveZoomFactor * 0.5, 1.0)
+            );
         } else {
             client.options.smoothCameraEnabled = previousSmoothCameraEnabled;
             client.options.getMouseSensitivity().setValue(previousMouseSensitivity);
