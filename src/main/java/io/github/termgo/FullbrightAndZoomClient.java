@@ -52,14 +52,14 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_G,
                 "key.categories.fullbright_and_zoom"
-        )));
+        ));
 
         ZOOM_KEY = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.fullbright_and_zoom.zoom",
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_C,
                 "key.categories.fullbright_and_zoom"
-        )));
+        ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (FULLBRIGHT_KEY.wasPressed()) {
