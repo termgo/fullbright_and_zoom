@@ -22,6 +22,7 @@ import java.nio.file.Path;
 
 public class FullbrightAndZoomClient implements ClientModInitializer {
     public static final double FULLBRIGHT_GAMMA = 10.0;
+    public static final double ZOOM_FACTOR = 4.0;
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path CONFIG_PATH = FabricLoader.getInstance()
@@ -31,6 +32,7 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
     public static KeyBinding ZOOM_KEY;
 
     private static boolean fullbrightEnabled;
+    private static boolean zooming;
 
     @Override
     public void onInitializeClient() {
@@ -54,11 +56,16 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
             while (FULLBRIGHT_KEY.wasPressed()) {
                 toggleFullbright(client);
             }
+            zooming = ZOOM_KEY.isPressed();
         });
     }
 
     public static boolean isFullbrightEnabled() {
         return fullbrightEnabled;
+    }
+
+    public static boolean isZooming() {
+        return zooming;
     }
 
     private static void toggleFullbright(MinecraftClient client) {

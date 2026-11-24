@@ -3,13 +3,10 @@
     "package": "io.github.termgo.mixin",
     "compatibilityLevel": "JAVA_21",
     "client": [
-        "LightmapTextureManagerMixin"
+        "LightmapTextureManagerMixin",
+        "GameRendererMixin"
     ],
-
     "injectors": {
         "defaultRequire": 1
-    },
-    "overwrites": {
-        "requireAnnotations": true
     }
 }
