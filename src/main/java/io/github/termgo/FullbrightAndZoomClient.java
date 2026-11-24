@@ -48,7 +48,7 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
     public void onInitializeClient() {
         Config config = loadConfig();
         fullbrightEnabled = config.fullbrightEnabled;
-        zoomFactor = sanitizeZoomFactor(config.zoomFactor);
+        zoomFactor = DEFAULT_ZOOM_FACTOR;
 
         FULLBRIGHT_KEY = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.fullbright_and_zoom.fullbright",
@@ -85,12 +85,11 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
     }
 
     public static void adjustZoom(double scrollAmount) {
-        if (scrollAmount == 0.0 || !Double.isFinite(scrollAmount)) {
+        if (scrollAmount == 0.0 || !Double.isFinite(scrollAmount) || !zooming) {
             return;
         }
 
         zoomFactor = sanitizeZoomFactor(zoomFactor * Math.pow(1.2, scrollAmount));
-        saveConfig();
     }
 
     public static double getZoomProgress() {
@@ -130,6 +129,10 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
         zoomTransitionStartNanos = System.nanoTime();
         zoomTarget = shouldZoom;
         zooming = shouldZoom;
+
+        if (!shouldZoom) {
+            zoomFactor = DEFAULT_ZOOM_FACTOR;
+        }
     }
 
     private static void updateZoomCameraOptions(MinecraftClient client) {
@@ -191,7 +194,7 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
         try {
             Files.createDirectories(CONFIG_PATH.getParent());
             try (Writer writer = Files.newBufferedWriter(CONFIG_PATH, StandardCharsets.UTF_8)) {
-                GSON.toJson(new Config(fullbrightEnabled, zoomFactor), writer);
+                GSON.toJson(new Config(fullbrightEnabled), writer);
             }
         } catch (IOException e) {
             Fullbright_and_zoom.LOGGER.warn("Failed to save configuration", e);
@@ -200,14 +203,12 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
 
     private static class Config {
         boolean fullbrightEnabled;
-        double zoomFactor = DEFAULT_ZOOM_FACTOR;
 
         Config() {
         }
 
-        Config(boolean fullbrightEnabled, double zoomFactor) {
+        Config(boolean fullbrightEnabled) {
             this.fullbrightEnabled = fullbrightEnabled;
-            this.zoomFactor = zoomFactor;
         }
     }
 }
