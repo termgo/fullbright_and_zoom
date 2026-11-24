@@ -4,6 +4,10 @@
 
 For setup instructions, please see the [Fabric Documentation page](https://docs.fabricmc.net/develop/getting-started/creating-a-project#setting-up) related to the IDE that you are using.
 
+## Acknowledgements
+
+This project references part of the Zoom implementation from [Meteor Client](https://github.com/MeteorDevelopment/meteor-client), including concepts for smooth zoom transitions and cinematic camera behavior.
+
 ## Authors and contributors
 
 - termgo — project author
