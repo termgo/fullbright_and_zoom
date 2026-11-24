@@ -37,8 +37,6 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
     private static boolean fullbrightEnabled;
     private static boolean zooming;
     private static boolean zoomTarget;
-    private static boolean previousSmoothCamera;
-    private static boolean cinematicCameraOverridden;
     private static double zoomFactor = DEFAULT_ZOOM_FACTOR;
     private static double zoomTransitionStartProgress;
     private static long zoomTransitionStartNanos = System.nanoTime();
@@ -54,14 +52,14 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_G,
                 "key.categories.fullbright_and_zoom"
-        ));
+        )));
 
         ZOOM_KEY = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.fullbright_and_zoom.zoom",
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_C,
                 "key.categories.fullbright_and_zoom"
-        ));
+        )));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (FULLBRIGHT_KEY.wasPressed()) {
@@ -71,7 +69,7 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
             boolean shouldZoom = client.player != null
                     && client.currentScreen == null
                     && ZOOM_KEY.isPressed();
-            setZooming(client, shouldZoom);
+            setZooming(shouldZoom);
         });
     }
 
@@ -87,7 +85,6 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
         return zoomFactor;
     }
 
-    /** Adjusts the zoom factor by 20% per wheel notch while zoom is held. */
     public static void adjustZoom(double scrollAmount) {
         if (scrollAmount == 0.0 || !Double.isFinite(scrollAmount)) {
             return;
@@ -97,12 +94,12 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
         saveConfig();
     }
 
-    /** Returns an eased zoom amount between 0 (normal FOV) and 1 (full zoom). */
     public static double getZoomProgress() {
         long elapsed = Math.max(0L, System.nanoTime() - zoomTransitionStartNanos);
         double amount = Math.min(1.0, (double) elapsed / ZOOM_TRANSITION_NANOS);
         double eased = amount * amount * (3.0 - 2.0 * amount);
-        return zoomTransitionStartProgress + ((zoomTarget ? 1.0 : 0.0) - zoomTransitionStartProgress) * eased;
+        return zoomTransitionStartProgress
+                + ((zoomTarget ? 1.0 : 0.0) - zoomTransitionStartProgress) * eased;
     }
 
     private static double sanitizeZoomFactor(double factor) {
@@ -112,7 +109,7 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
         return Math.max(MIN_ZOOM_FACTOR, Math.min(MAX_ZOOM_FACTOR, factor));
     }
 
-    private static void setZooming(MinecraftClient client, boolean shouldZoom) {
+    private static void setZooming(boolean shouldZoom) {
         if (zooming == shouldZoom) {
             return;
         }
@@ -121,19 +118,6 @@ public class FullbrightAndZoomClient implements ClientModInitializer {
         zoomTransitionStartNanos = System.nanoTime();
         zoomTarget = shouldZoom;
         zooming = shouldZoom;
-
-        if (client.options == null) {
-            return;
-        }
-
-        if (shouldZoom) {
-            previousSmoothCamera = client.options.smoothCamera;
-            client.options.smoothCamera = true;
-            cinematicCameraOverridden = true;
-        } else if (cinematicCameraOverridden) {
-            client.options.smoothCamera = previousSmoothCamera;
-            cinematicCameraOverridden = false;
-        }
     }
 
     private static void toggleFullbright(MinecraftClient client) {
